@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace School_Management_System.DatabasAccess.EntityFramework.Entities
+namespace School_Management_System.DatabaseAccess.EntityFramework.Entities
 {
     public class ClassRecord
     {

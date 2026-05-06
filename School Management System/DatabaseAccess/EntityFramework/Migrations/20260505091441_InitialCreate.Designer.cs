@@ -4,13 +4,13 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using School_Management_System.DatabasAccess.EntityFramework;
+using School_Management_System.DatabaseAccess.EntityFramework;
 
 #nullable disable
 
 namespace School_Management_System.Migrations
 {
-    [DbContext(typeof(DatabasAccess.EntityFramework.SchoolDbContext))]
+    [DbContext(typeof(DatabaseAccess.EntityFramework.SchoolDbContext))]
     [Migration("20260505091441_InitialCreate")]
     partial class InitialCreate
     {
