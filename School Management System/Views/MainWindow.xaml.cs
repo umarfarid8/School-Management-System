@@ -32,10 +32,15 @@ namespace School_Management_System
             InitializeComponent();
             LoadAllData();
         }
+
+        //Student DataGrid
         private void LoadAllData()
         {
             StudentDataGrid.ItemsSource = _studentRepo.GetAllStudentRecords();
+
         }
+
+        // student ka record add karne ke liye button click event handler
         private void AddStudentButton_Click(object sender, RoutedEventArgs e)
         {
             var win = new AddStudentWindow();
@@ -46,10 +51,64 @@ namespace School_Management_System
         {
             LoadAllData();
         }
+        // student record edit karne ke liye double click event handler
+        private void StudentDataGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (StudentDataGrid.SelectedItem is Student selectedStudent)
+            {
+                OpenEditForm(selectedStudent);
+            }
+        }
+        // student record edit karne ke liye button click event handler
+        private void EditStudentBtn_Click(object sender, RoutedEventArgs e)
+        {
+            var button = sender as System.Windows.Controls.Button;
+            if(button.DataContext is Student selectedStudent)
+            {
+                OpenEditForm(selectedStudent);
+            }
+        }
+
+        // student record edit karne ke liye form open karne ka method
+        private void OpenEditForm(Student student)
+        {
+            var editWin = new AddStudentWindow(student);
+            if (editWin.ShowDialog() == true)
+            {
+                LoadAllData(); // Refresh data after editing a student
+            }
+        }
+
+        // student record delete karne ke liye button click event handler
+
+        public void DeleteStudentBtn_Click(object sender, RoutedEventArgs e)
+        {
+            var button = sender as System.Windows.Controls.Button;
+            if (button?.DataContext is Student selectedStudent)
+            {
+                MessageBoxResult result = MessageBox.Show($"Are you sure you want to delete {selectedStudent.FirstName} {selectedStudent.LastName}?", "Confirm Deletion", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    try
+                    {
+                        _studentRepo.DeleteStudent(selectedStudent);
+                        LoadAllData(); // Refresh data after deletion
+                        MessageBox.Show("Student deleted successfully.");
+                    }
+                    catch (System.Exception ex)
+                    {
+                        MessageBox.Show($"An error occurred while deleting the student: {ex.Message}");
+                    }
+                }
+            }
+        }
+        //Class DataGrid
         private void OpenFormButton_Click(object sender, RoutedEventArgs e)
         {
             AddClassWindow form = new AddClassWindow();
             form.ShowDialog();
+            LoadAllData(); // Refresh data after adding a class
         }
         private void ShowRecordsButton_Click(object sender, RoutedEventArgs e)
         {
@@ -59,6 +118,7 @@ namespace School_Management_System
                 {
                     var allClasses = db.Classes.ToList();
                     ClassesData.ItemsSource = allClasses;
+
                 }
             }
             catch (System.Exception ex)
@@ -75,6 +135,56 @@ namespace School_Management_System
                 LoadAllData();
             }
         }
+        // Class record edit karne ke liye double click event handler
+        private void ClassesData_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if(ClassesData.SelectedItem is ClassRecord selectedClass)
+            {
+                OpenEditClassForm(selectedClass);
+            }
+        }
+        // Class record edit karne ke liye button click event handler
+        private void EditClassBtn_Click(object sender, RoutedEventArgs e)
+        {
+            var button = sender as Button;
+            if (button != null && button.DataContext is ClassRecord selectedClass)
+            {
+                OpenEditClassForm(selectedClass);
+            }
+        }
+
+        // Class record edit karne ke liye form open karne ka method
+        private void OpenEditClassForm(ClassRecord classRecord)
+        {
+            var editWin = new AddClassWindow(classRecord);
+            if (editWin.ShowDialog() == true)
+            {
+                LoadAllData(); // Refresh data after editing a class
+            }
+        }
+
+        // Class record delete karne ke liye button click event handler
+        private void DeleteClassBtn_Click(object sender, RoutedEventArgs e)
+        {
+           var button = sender as System.Windows.Controls.Button;
+            if (button != null && button.DataContext is ClassRecord selectedClass)
+            {
+                var result = MessageBox.Show($"Delete {selectedClass.ClassName}?", "Confirm Deletion", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                if (result == MessageBoxResult.Yes)
+                {
+                    try
+                    {
+                        _classRecordRepo.DeleteClass(selectedClass);
+                        LoadAllData(); // Refresh data after deletion
+                        MessageBox.Show("Class deleted successfully.");
+                    }
+                    catch (System.Exception ex)
+                    {
+                        MessageBox.Show($"An error occurred while deleting the class: {ex.Message}");
+                    }
+                }
+            }
+        }
         private void NavDashboard_Click(object sender, RoutedEventArgs e)
         {
 
@@ -87,11 +197,6 @@ namespace School_Management_System
         {
             
         }
-        private void OpenAddClass_Click(object sender, RoutedEventArgs e)
-        {
-            var addClassWin = new AddClassWindow();
-            addClassWin.ShowDialog();
-            LoadAllData();
-        }
+       
     }
 }

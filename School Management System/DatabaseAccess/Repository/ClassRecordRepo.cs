@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace School_Management_System.DatabaseAccess.Repository
 {
     internal class ClassRecordRepo
@@ -18,6 +19,7 @@ namespace School_Management_System.DatabaseAccess.Repository
                 return context.Classes.ToList();
             }
         }
+        // logic for adding a class record to the database
         public void AddClassRecord(string className, string classRoom)
         {
             using (var context = new EntityFramework.SchoolDbContext())
@@ -31,6 +33,28 @@ namespace School_Management_System.DatabaseAccess.Repository
                 context.SaveChanges();
             }
         }
-        
+        // logic for updating a class record in the database    
+        public void UpdateClass(ClassRecord classRecord)
+        {
+            using (var context = new SchoolDbContext())
+            {
+                context.Classes.Attach(classRecord);
+                context.Entry(classRecord).State = EntityState.Modified;
+                context.SaveChanges();
+            }
+
+        }
+        // logic for deleting a class record from the database
+        public void DeleteClass(ClassRecord classRecord)
+        {
+            using (var context = new SchoolDbContext())
+            {
+               
+                context.Classes.Remove(classRecord);
+                context.SaveChanges();
+            }
+        }
+
+       
     }
-}
+    }
