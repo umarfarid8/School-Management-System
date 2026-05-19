@@ -10,42 +10,60 @@ namespace School_Management_System.DatabaseAccess.Repository
 {
     public class StudentRepo
     {
-        private readonly SchoolDbContext _context = new SchoolDbContext();
-        public IEnumerable<Student> GetAllStudentRecords()
+       
+        //public IEnumerable<Student> GetAllStudentRecords()
+        //{
+        //    using (var context = new SchoolDbContext())
+        //    {
+        //        return context.Students.ToList();
+        //    }
+        //}
+        // logic for adding a student to the database
+        //public void AddStudent(string firstName, string lastName, string email, string phoneNumber)
+        //{
+
+
+        //    try
+        //    {
+        //        var newStudent = new Student
+        //        {
+        //            FirstName = firstName,
+        //            LastName = lastName,
+        //            Email = email,
+        //            PhoneNumber = phoneNumber
+        //        };
+        //        using (var context = new SchoolDbContext())
+        //        {
+        //            context.Students.Add(newStudent);
+        //            context.SaveChanges();
+        //        }
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // Handle exceptions (e.g., log the error)
+        //        Console.WriteLine($"An error occurred while adding a student: {ex.Message}");
+        //    }
+            
+        //}
+        public List<Student> GetAllStudentRecords()
         {
             using (var context = new SchoolDbContext())
             {
-                return context.Students.ToList();
-            }
-        }
-        // logic for adding a student to the database
-        public void AddStudent(string firstName, string lastName, string email, string phoneNumber)
-        {
-            try
-            {
-                var newStudent = new Student
-                {
-                    FirstName = firstName,
-                    LastName = lastName,
-                    Email = email,
-                    PhoneNumber = phoneNumber
-                };
-                using (var context = new SchoolDbContext())
-                {
-                    context.Students.Add(newStudent);
-                    context.SaveChanges();
-                }
-            }
-            catch (Exception ex)
-            {
-                // Handle exceptions (e.g., log the error)
-                Console.WriteLine($"An error occurred while adding a student: {ex.Message}");
-            }
+                return context.Students
+                    .Include(s => s.AssignedClass)
+                    .Include(s => s.AssignedTeacher)
+                    .ToList();
 
+            }      
         }
-        public List<Student> GetAllStudentsRecords()
+        public void AddStudentObject(Student student)
         {
-                return _context.Students.ToList();   
+            using (var context = new SchoolDbContext())
+            {
+                context.Students.Add(student);
+                context.SaveChanges();
+            }
         }
 
         // logic for updating a student record in the database

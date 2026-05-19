@@ -41,16 +41,30 @@ namespace School_Management_System
         // logic for save button click event handler
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
+            if (string.IsNullOrWhiteSpace((ClassNameTextBox.Text)))
+            {
+                MessageBox.Show("Please Enter a class Name");
+                return;
+            }
 
             if(_classToEdit == null)
             {
-                string enteredClassName = ClassNameTextBox.Text;
-                string enteredRoomNumber = RoomNumberTextBox.Text;
 
-                var repository = new ClassRecordRepo();
-                repository.AddClassRecord(enteredClassName, enteredRoomNumber);
-                MessageBox.Show("Class added successfully!");
-                this.Close();
+                var newClass = new ClassRecord
+                {
+                    ClassName = ClassNameTextBox.Text,
+                    ClassRoom = RoomNumberTextBox.Text
+                };
+                _classRepo.AddClassRecord(newClass);
+                MessageBox.Show("Class Added Successfully!");
+
+                //string enteredClassName = ClassNameTextBox.Text;
+                //string enteredRoomNumber = RoomNumberTextBox.Text;
+
+                //var repository = new ClassRecordRepo();
+                //repository.AddClassRecord(enteredClassName, enteredRoomNumber);
+                //MessageBox.Show("Class added successfully!");
+                //this.Close();
 
             }
             else

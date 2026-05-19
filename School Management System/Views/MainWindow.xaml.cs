@@ -15,6 +15,8 @@ using School_Management_System.DatabaseAccess.Repository;
 using System.Collections.Generic;
 using School_Management_System.DatabaseAccess.EntityFramework.Entities;
 using School_Management_System.Views;
+using Microsoft.EntityFrameworkCore;
+
 namespace School_Management_System
 {
     /// <summary>
@@ -24,7 +26,7 @@ namespace School_Management_System
     {
         private readonly StudentRepo _studentRepo = new StudentRepo();
         private readonly ClassRecordRepo _classRecordRepo = new ClassRecordRepo();
-
+        private readonly TeacherRepo _teacherRepo = new TeacherRepo();
         public List<ClassRecord> ItemsSource { get; private set; } = new List<ClassRecord>();
 
         public MainWindow()
@@ -36,8 +38,38 @@ namespace School_Management_System
         //Student DataGrid
         private void LoadAllData()
         {
-            StudentDataGrid.ItemsSource = _studentRepo.GetAllStudentRecords();
+            using (var context = new SchoolDbContext())
+            {
+                int studentCount = context.Students.Count();
+                int teacherCount = context.Teachers.Count();
+                int classCount = context.Classes.Count();
 
+                TotalStudentsCount.Text = studentCount.ToString();
+                TotalTeachersCount.Text = teacherCount.ToString();
+                TotalTeachersCount.Text = classCount.ToString();
+
+                var today = DateTime.Today;
+                int presentToday = context.AttendanceRecords.
+                    Count(a => a.Date.Date == today && a.Status == "Present");
+                if (studentCount > 0)
+                {
+                    double rate = ((double)presentToday / studentCount) * 100;
+                    AttendanceRateText.Text = $"{rate:F0}%";
+                }
+                else
+                {
+                    AttendanceRateText.Text ="0%";
+
+                }
+
+
+                    StudentDataGrid.ItemsSource = context.Students.Include(s => s.AssignedClass).ToList();
+                TeacherDataGrid.ItemsSource = context.Teachers.ToList();
+                ClassesData.ItemsSource = context.Classes.ToList();
+
+                ActivityLog.Items.Insert(0, $"Dashboard refereshed at {DateTime.Now:HH:mm:ss}");
+
+            }
         }
 
         // student ka record add karne ke liye button click event handler
@@ -45,7 +77,7 @@ namespace School_Management_System
         {
             var win = new AddStudentWindow();
             win.ShowDialog();
-            LoadAllData(); // Refresh data after adding a student
+            LoadAllData();
         }
         private void RefreshStudents_Click(object sender, RoutedEventArgs e)
         {
@@ -75,7 +107,7 @@ namespace School_Management_System
             var editWin = new AddStudentWindow(student);
             if (editWin.ShowDialog() == true)
             {
-                LoadAllData(); // Refresh data after editing a student
+                LoadAllData(); 
             }
         }
 
@@ -93,7 +125,7 @@ namespace School_Management_System
                     try
                     {
                         _studentRepo.DeleteStudent(selectedStudent);
-                        LoadAllData(); // Refresh data after deletion
+                        LoadAllData(); 
                         MessageBox.Show("Student deleted successfully.");
                     }
                     catch (System.Exception ex)
@@ -108,18 +140,13 @@ namespace School_Management_System
         {
             AddClassWindow form = new AddClassWindow();
             form.ShowDialog();
-            LoadAllData(); // Refresh data after adding a class
+            LoadAllData(); 
         }
         private void ShowRecordsButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                using (var db = new SchoolDbContext())
-                {
-                    var allClasses = db.Classes.ToList();
-                    ClassesData.ItemsSource = allClasses;
-
-                }
+                LoadAllData();
             }
             catch (System.Exception ex)
             {
@@ -159,7 +186,7 @@ namespace School_Management_System
             var editWin = new AddClassWindow(classRecord);
             if (editWin.ShowDialog() == true)
             {
-                LoadAllData(); // Refresh data after editing a class
+                LoadAllData(); 
             }
         }
 
@@ -185,18 +212,151 @@ namespace School_Management_System
                 }
             }
         }
+
+        // teacher data grid
+       
+        private void OpenAddTeacher_Click(object sender, RoutedEventArgs e)
+        {
+            var win = new AddTeacherWindow();
+            if (win.ShowDialog() == true)
+                LoadAllData();
+        }
+        private void TeacherDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if(TeacherDataGrid.SelectedItem is Teacher selectedTeacher)
+            {
+                OpenEditTeacherForm(selectedTeacher);
+            }
+        }
+        private void EditTeacherBtn_Click(object sender, RoutedEventArgs e)
+        {
+            var btn = sender as Button;
+            if (btn != null && btn.DataContext is Teacher selectedTeacher)
+            {
+                OpenEditTeacherForm(selectedTeacher);
+            }
+        }
+        private void OpenEditTeacherForm(Teacher teacher)
+        {
+            var editWin = new AddTeacherWindow(teacher);
+            if (editWin.ShowDialog() == true)
+            {
+                LoadAllData(); 
+            }
+        }
+        private void DeleteTeacherBtn_Click(object sender, RoutedEventArgs e)
+        {
+            var btn = sender as Button;
+            if(btn != null && btn.DataContext is Teacher selectedTeacher)
+            {
+                var result = MessageBox.Show($"Are you sure you want to delete {selectedTeacher.FirstName} {selectedTeacher.LastName}?", "Confirm Deletion", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                
+                if(result == MessageBoxResult.Yes)
+                {
+                    _teacherRepo.DeleteTeacher(selectedTeacher);
+                    LoadAllData();
+                    MessageBox.Show("Teacher deleted successfully.");
+
+                }
+            }
+        }
+        private void RefreshTeachers_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                LoadAllData();
+            }
+            catch (System.Exception ex)
+            {
+                MessageBox.Show($"An error occurred while refreshing teachers: {ex.Message}");
+            }
+        }
+
+
+        // Attendance Tab
+        private void LoadAttendanceList_Click(object sender, RoutedEventArgs e)
+        {
+            var students = _studentRepo.GetAllStudentRecords();
+            AttendanceGrid.ItemsSource = students;
+
+        }
+
+        private void SaveAttendance_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                using (var context = new SchoolDbContext())
+                {
+                    DateTime selectedDate = AttendanceDatePicker.SelectedDate ?? DateTime.Now;
+                    foreach (var student in AttendanceGrid.Items.Cast<Student>())
+                    {
+                        var existingRecord = context.AttendanceRecords.FirstOrDefault(a => a.StudentId
+                        == student.Id && a.Date.Date == selectedDate.Date);
+                        if (existingRecord != null)
+                        {
+                            existingRecord.Status = "Present";
+                        }
+                        else
+                        {
+                            var newRecord = new AttendanceRecord
+                            {
+                                StudentId = student.Id,
+                                Date = selectedDate,
+                                Status ="Present"
+                            };
+                            context.AttendanceRecords.Add(newRecord);
+                        }
+                    }
+                    context.SaveChanges();
+                    MessageBox.Show($"Attendance for {selectedDate.ToShortDateString()} saved successfully.");
+                    LoadAllData();
+                }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show($"An error occurred while saving attendance: {ex.Message}");
+            }
+        }
+
+        // history view ka liye ligic
+        private void ViewHistory_Click(object sender, RoutedEventArgs e)
+        {
+            DateTime selectedDate = HistoryDatePicker.SelectedDate ?? DateTime.Now;
+            using (var context = new SchoolDbContext())
+            {
+                var records = context.AttendanceRecords.
+                    Include(a => a.Student)
+                    .Where(a => a.Date.Date == selectedDate.Date)
+                    .ToList();
+                if (records.Count == 0)
+                {
+                    MessageBox.Show($"No attendance records found for this Date ", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+
+                }
+                HistoryGrid.ItemsSource = records;
+
+            }
+        }
         private void NavDashboard_Click(object sender, RoutedEventArgs e)
         {
-
+            MainTabControl.SelectedIndex = 0;
         }
         private void NavStudents_Click(object sender, RoutedEventArgs e)
         {
-            
+            MainTabControl.SelectedIndex = 0;
         }
         private void NavClasses_Click(object sender, RoutedEventArgs e)
         {
-            
+            MainTabControl.SelectedIndex = 1;
         }
-       
+        private void NavTeachers_Click(object sender, RoutedEventArgs e)
+        {
+            MainTabControl.SelectedIndex = 2;
+        }
+
+        private void TeacherDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
     }
 }

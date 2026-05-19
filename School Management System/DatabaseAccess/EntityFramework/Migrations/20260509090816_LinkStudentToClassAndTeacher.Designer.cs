@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using School_Management_System.DatabaseAccess.EntityFramework;
 
@@ -11,9 +12,11 @@ using School_Management_System.DatabaseAccess.EntityFramework;
 namespace School_Management_System.Migrations
 {
     [DbContext(typeof(SchoolDbContext))]
-    partial class SchoolContextModelSnapshot : ModelSnapshot
+    [Migration("20260509090816_LinkStudentToClassAndTeacher")]
+    partial class LinkStudentToClassAndTeacher
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,31 +24,6 @@ namespace School_Management_System.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("School_Management_System.DatabaseAccess.EntityFramework.Entities.AttendanceRecord", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("StudentId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("StudentId");
-
-                    b.ToTable("AttendanceRecords");
-                });
 
             modelBuilder.Entity("School_Management_System.DatabaseAccess.EntityFramework.Entities.ClassRecord", b =>
                 {
@@ -77,6 +55,9 @@ namespace School_Management_System.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("AssignedClassId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("ClassId")
                         .HasColumnType("int");
 
                     b.Property<string>("Email")
@@ -138,17 +119,6 @@ namespace School_Management_System.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Teachers");
-                });
-
-            modelBuilder.Entity("School_Management_System.DatabaseAccess.EntityFramework.Entities.AttendanceRecord", b =>
-                {
-                    b.HasOne("School_Management_System.DatabaseAccess.EntityFramework.Entities.Student", "Student")
-                        .WithMany()
-                        .HasForeignKey("StudentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("School_Management_System.DatabaseAccess.EntityFramework.Entities.Student", b =>

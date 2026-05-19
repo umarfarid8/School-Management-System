@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using School_Management_System.DatabaseAccess.EntityFramework;
 
@@ -11,9 +12,11 @@ using School_Management_System.DatabaseAccess.EntityFramework;
 namespace School_Management_System.Migrations
 {
     [DbContext(typeof(SchoolDbContext))]
-    partial class SchoolContextModelSnapshot : ModelSnapshot
+    [Migration("20260518074007_AddAttendanceTable")]
+    partial class AddAttendanceTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

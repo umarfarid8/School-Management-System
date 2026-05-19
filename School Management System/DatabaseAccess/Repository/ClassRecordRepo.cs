@@ -20,16 +20,17 @@ namespace School_Management_System.DatabaseAccess.Repository
             }
         }
         // logic for adding a class record to the database
-        public void AddClassRecord(string className, string classRoom)
+        public void AddClassRecord(ClassRecord classRecord)
         {
             using (var context = new EntityFramework.SchoolDbContext())
             {
-                var newClassRecord = new EntityFramework.Entities.ClassRecord
-                {
-                    ClassName = className,
-                    ClassRoom = classRoom
-                };
-                context.Classes.Add(newClassRecord);
+                //var newClassRecord = new EntityFramework.Entities.ClassRecord
+                //{
+                //    ClassName = className,
+                //    ClassRoom = classRoom
+                //};
+                context.Classes.Add(classRecord);
+                context.Entry(classRecord).State = EntityState.Modified;
                 context.SaveChanges();
             }
         }
@@ -38,8 +39,15 @@ namespace School_Management_System.DatabaseAccess.Repository
         {
             using (var context = new SchoolDbContext())
             {
-                context.Classes.Attach(classRecord);
-                context.Entry(classRecord).State = EntityState.Modified;
+                var existing = context.Classes.Find(classRecord.Id);
+                if (existing == null) return;
+                existing.ClassName = classRecord.ClassName;
+                existing.ClassRoom = classRecord.ClassRoom;
+                //{
+                    
+                //}
+                //context.Classes.Update(classRecord);
+                //context.Entry(classRecord).State = EntityState.Modified;
                 context.SaveChanges();
             }
 
@@ -50,6 +58,7 @@ namespace School_Management_System.DatabaseAccess.Repository
             using (var context = new SchoolDbContext())
             {
                
+                context.Classes.Attach(classRecord);
                 context.Classes.Remove(classRecord);
                 context.SaveChanges();
             }
