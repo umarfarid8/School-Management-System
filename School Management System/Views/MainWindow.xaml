@@ -5,6 +5,7 @@
         Background="#F4F7F9"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:conv="clr-namespace:School_Management_System.Converters"
+        
         >
     <Window.Resources>
         <conv:InverseBoolConverter x:Key="InverseBoolConverter"/>
@@ -51,8 +52,13 @@
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
                                                     <StackPanel Orientation="Horizontal">
-                                                        <RadioButton Content="P" IsChecked="{Binding IsPresent}" Margin="5"/>
-                                                        <RadioButton Content="A" IsChecked="{Binding IsPresent, Converter={StaticResource InverseBoolConverter}}" Margin="5"/>
+                                                        <RadioButton Content="Present" 
+                             IsChecked="{Binding IsPresent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                             Margin="5"/>
+
+                                                        <RadioButton Content="Absent" 
+                             IsChecked="{Binding IsPresent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBoolConverter}}" 
+                             Margin="5"/>
                                                     </StackPanel>
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellTemplate>
@@ -81,7 +87,9 @@
                                 <DataGrid x:Name="HistoryGrid" Grid.Row="1" AutoGenerateColumns="False" IsReadOnly="True" AlternatingRowBackground="#F2F2F2">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat=\{0:dd-MM-yyyy\}}" Width="100"/>
-                                        <DataGridTextColumn Header="Student" Binding="{Binding Student.FirstName}" Width="*"/>
+                                        <DataGridTextColumn Header="Student" 
+                    Binding="{Binding Student.FirstName, TargetNullValue='Deleted Student'}" 
+                    Width="*"/>
                                         <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100">
                                             <DataGridTextColumn.ElementStyle>
                                                 <Style TargetType="TextBlock">

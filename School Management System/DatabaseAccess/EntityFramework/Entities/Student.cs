@@ -23,11 +23,7 @@ namespace School_Management_System.DatabaseAccess.EntityFramework.Entities
 
 
         [NotMapped]
-        public bool IsPresent { get; set; }
+        public bool IsPresent { get; set; } = true;
 
-        public void Dispose()
-        {
-           //dispose connection
-        }
     }
 }

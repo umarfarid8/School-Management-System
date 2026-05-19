@@ -27,6 +27,7 @@ namespace School_Management_System
         private readonly StudentRepo _studentRepo = new StudentRepo();
         private readonly ClassRecordRepo _classRecordRepo = new ClassRecordRepo();
         private readonly TeacherRepo _teacherRepo = new TeacherRepo();
+        private readonly AttendanceRepo _attendanceRepo = new AttendanceRepo();
         public List<ClassRecord> ItemsSource { get; private set; } = new List<ClassRecord>();
 
         public MainWindow()
@@ -46,7 +47,7 @@ namespace School_Management_System
 
                 TotalStudentsCount.Text = studentCount.ToString();
                 TotalTeachersCount.Text = teacherCount.ToString();
-                TotalTeachersCount.Text = classCount.ToString();
+                TotalClassesCount.Text = classCount.ToString();
 
                 var today = DateTime.Today;
                 int presentToday = context.AttendanceRecords.
@@ -247,16 +248,37 @@ namespace School_Management_System
         private void DeleteTeacherBtn_Click(object sender, RoutedEventArgs e)
         {
             var btn = sender as Button;
-            if(btn != null && btn.DataContext is Teacher selectedTeacher)
+            if(btn?.DataContext is Teacher selectedTeacher)
             {
                 var result = MessageBox.Show($"Are you sure you want to delete {selectedTeacher.FirstName} {selectedTeacher.LastName}?", "Confirm Deletion", MessageBoxButton.YesNo, MessageBoxImage.Warning);
                 
                 if(result == MessageBoxResult.Yes)
                 {
-                    _teacherRepo.DeleteTeacher(selectedTeacher);
-                    LoadAllData();
-                    MessageBox.Show("Teacher deleted successfully.");
-
+                    try
+                    {
+                        using (var context = new SchoolDbContext())
+                        {
+                            var teacherInDb = context.Teachers.Find(selectedTeacher.Id);
+                            if (teacherInDb != null)
+                            {
+                                var LinkedStudents = context.Students
+                                    .Where(s => s.TeacherId == selectedTeacher.Id)
+                                    .ToList();
+                                foreach (var student in LinkedStudents)
+                                {
+                                    student.TeacherId = null;
+                                }
+                                context.Teachers.Remove(teacherInDb);
+                                context.SaveChanges();
+                                MessageBox.Show("Teacher is Deleted and Students unassigned successfully");
+                                LoadAllData();
+                            }
+                        }
+                    }
+                    catch (Exception ex) {
+                        string error = ex.InnerException?.Message ?? ex.Message;
+                        MessageBox.Show($"Database Error: {error}");
+                    }
                 }
             }
         }
@@ -283,34 +305,23 @@ namespace School_Management_System
 
         private void SaveAttendance_Click(object sender, RoutedEventArgs e)
         {
+            AttendanceGrid.CommitEdit(DataGridEditingUnit.Row, true);
+           
             try
             {
-                using (var context = new SchoolDbContext())
-                {
+               
+                
                     DateTime selectedDate = AttendanceDatePicker.SelectedDate ?? DateTime.Now;
-                    foreach (var student in AttendanceGrid.Items.Cast<Student>())
-                    {
-                        var existingRecord = context.AttendanceRecords.FirstOrDefault(a => a.StudentId
-                        == student.Id && a.Date.Date == selectedDate.Date);
-                        if (existingRecord != null)
-                        {
-                            existingRecord.Status = "Present";
-                        }
-                        else
-                        {
-                            var newRecord = new AttendanceRecord
-                            {
-                                StudentId = student.Id,
-                                Date = selectedDate,
-                                Status ="Present"
-                            };
-                            context.AttendanceRecords.Add(newRecord);
-                        }
-                    }
-                    context.SaveChanges();
+                var recordsToSave = AttendanceGrid.Items.Cast<Student>().Select(student => new AttendanceRecord
+                {
+                    StudentId = student.Id,
+                    Date = selectedDate,
+                    Status = student.IsPresent ? "Present" : "Absent"
+                }).ToList();
+                _attendanceRepo.SaveOrUpdateAttendance(recordsToSave);
                     MessageBox.Show($"Attendance for {selectedDate.ToShortDateString()} saved successfully.");
                     LoadAllData();
-                }
+                
             }
             catch(Exception ex)
             {
@@ -322,20 +333,16 @@ namespace School_Management_System
         private void ViewHistory_Click(object sender, RoutedEventArgs e)
         {
             DateTime selectedDate = HistoryDatePicker.SelectedDate ?? DateTime.Now;
-            using (var context = new SchoolDbContext())
-            {
-                var records = context.AttendanceRecords.
-                    Include(a => a.Student)
-                    .Where(a => a.Date.Date == selectedDate.Date)
-                    .ToList();
-                if (records.Count == 0)
-                {
+            var history = _attendanceRepo.GetHistoryByDate(selectedDate);
+
+                if (history.Count == 0)
+                
                     MessageBox.Show($"No attendance records found for this Date ", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
 
-                }
-                HistoryGrid.ItemsSource = records;
+                
+                HistoryGrid.ItemsSource = history;
 
-            }
+            
         }
         private void NavDashboard_Click(object sender, RoutedEventArgs e)
         {
