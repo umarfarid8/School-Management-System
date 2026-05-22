@@ -28,6 +28,7 @@ namespace School_Management_System
         private readonly ClassRecordRepo _classRecordRepo = new ClassRecordRepo();
         private readonly TeacherRepo _teacherRepo = new TeacherRepo();
         private readonly AttendanceRepo _attendanceRepo = new AttendanceRepo();
+        private readonly NoticeRepo _noticeRepo = new NoticeRepo();
         public List<ClassRecord> ItemsSource { get; private set; } = new List<ClassRecord>();
 
         public MainWindow()
@@ -67,6 +68,7 @@ namespace School_Management_System
                     StudentDataGrid.ItemsSource = context.Students.Include(s => s.AssignedClass).ToList();
                 TeacherDataGrid.ItemsSource = context.Teachers.ToList();
                 ClassesData.ItemsSource = context.Classes.ToList();
+                NoticesDataGrid.ItemsSource = _noticeRepo.GetAllNotices();
 
                 ActivityLog.Items.Insert(0, $"Dashboard refereshed at {DateTime.Now:HH:mm:ss}");
 
@@ -344,26 +346,149 @@ namespace School_Management_System
 
             
         }
+
+        // Notices ka liye 
+
+        public void SaveNotice_Click(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(NoticeTitleTxt.Text) || string.IsNullOrWhiteSpace(NoticeContentTxt.Text))
+            {
+                MessageBox.Show("Please Provide both title and content", "Validation Warning");
+                return;
+            }
+            var notice = new Notice
+            {
+                Title = NoticeTitleTxt.Text.Trim(),
+                Content = NoticeContentTxt.Text.Trim()
+            };
+            try
+            {
+                if (string.IsNullOrWhiteSpace(NoticeTitleTxt.Text) && int.TryParse(NoticeIdTxt.Text, out int parsedId))
+                {
+                    notice.Id = parsedId;
+                    _noticeRepo.AddNotice(notice);
+                    MessageBox.Show("Notice Published Successfully", "Success");
+
+                }
+                else
+                {
+
+
+
+                    _noticeRepo.AddNotice(notice);
+
+
+                    MessageBox.Show("Notice Published Successfully", "Success");
+                }
+                ClearNoticeFields();
+                NoticesDataGrid.ItemsSource = _noticeRepo.GetAllNotices();
+            }
+            catch (Exception ex) 
+            {
+                MessageBox.Show($"Error : {ex.Message}");
+            }
+        }
+        private void DeleteNotice_Click(object sender, RoutedEventArgs e)
+        {
+            var button = sender as Button;
+            if (button?.DataContext is Notice selectedNotice)
+            {
+                var choice = MessageBox.Show($"Are you sure you want to delete the notice: '{selectedNotice.Title}'?", "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                if (choice == MessageBoxResult.Yes)
+                {
+                    try
+                    {
+                        _noticeRepo.DeleteNotice(selectedNotice.Id);
+                        LoadAllData();
+                        MessageBox.Show("Notice Removed from Database");
+
+                    }
+                    catch (Exception ex) {
+
+                        MessageBox.Show($"SQL Deletion Error: {ex.Message}");
+                    }
+                }
+            } 
+        }
+        private void EditNotice_Click(Object sender, RoutedEventArgs e)
+        {
+            var button = sender as Button;
+            if(button?.DataContext is Notice selectedNotice)
+            {
+                NoticeIdTxt.Text = selectedNotice.Id.ToString();
+                NoticeTitleTxt.Text = selectedNotice.Title;
+                NoticeContentTxt.Text = selectedNotice.Content;
+                SaveNoticeBtn.Content = "💾 Update Notice";
+            }
+        }
+        private void ClearNoticeForm_Click(object sender, RoutedEventArgs e)
+        {
+            ClearNoticeFields();
+        }
+        private void ClearNoticeFields()
+        {
+            NoticeIdTxt.Text = string.Empty;
+            NoticeTitleTxt.Text = string.Empty;
+            NoticeContentTxt.Text = string.Empty;
+            SaveNoticeBtn.Content = "🚀 Publish Notice";
+        }
+
+        // logout ka liye
+        private void LogoutBtn_Click(object sender, RoutedEventArgs e)
+        {
+            var confirmation = MessageBox.Show("Are you sure you want to logout?", "Confirm Logout", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (confirmation == MessageBoxResult.Yes)
+            {
+                LoginWindow loginWin = new LoginWindow();
+                loginWin.Show();
+                this.Close();
+
+            }
+        }
         private void NavDashboard_Click(object sender, RoutedEventArgs e)
         {
             MainTabControl.SelectedIndex = 0;
         }
-        private void NavStudents_Click(object sender, RoutedEventArgs e)
-        {
-            MainTabControl.SelectedIndex = 0;
-        }
-        private void NavClasses_Click(object sender, RoutedEventArgs e)
+        private void NavAttendance_Click(object sender, RoutedEventArgs e)
         {
             MainTabControl.SelectedIndex = 1;
         }
-        private void NavTeachers_Click(object sender, RoutedEventArgs e)
+        private void NavStudents_Click(object sender, RoutedEventArgs e)
+        {
+            MainTabControl.SelectedIndex = 3;
+        }
+        private void NavClasses_Click(object sender, RoutedEventArgs e)
         {
             MainTabControl.SelectedIndex = 2;
+        }
+        private void NavTeachers_Click(object sender, RoutedEventArgs e)
+        {
+            MainTabControl.SelectedIndex = 4;
+        }
+        private void NavNoticeBoard_Click(object sender, RoutedEventArgs e)
+        {
+            MainTabControl.SelectedIndex = 5;
         }
 
         private void TeacherDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
 
         }
+        private void MainTabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (CurrentTabTitle == null) return;
+            switch (MainTabControl.SelectedIndex)
+            {
+                case 0: CurrentTabTitle.Text = "Control Dashboard"; break;
+                case 1: CurrentTabTitle.Text = " Attendance Manager"; break;
+                case 2: CurrentTabTitle.Text = "Class Logs"; break;
+                case 3:CurrentTabTitle.Text = "Student Registry"; break;
+                case 4: CurrentTabTitle.Text = "Faculty Profiles"; break;
+                case 5: CurrentTabTitle.Text = " School Notice Board"; break;
+
+
+            }
+        }
+        
     }
 }

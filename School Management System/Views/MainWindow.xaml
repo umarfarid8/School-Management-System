@@ -1,284 +1,331 @@
 ﻿<Window x:Class="School_Management_System.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="School Admin Dashboard" Height="600" Width="1000" WindowStartupLocation="CenterScreen"
+        Title="School Management System - Admin Panel" Height="650" Width="1050" WindowStartupLocation="CenterScreen"
         Background="#F4F7F9"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         xmlns:conv="clr-namespace:School_Management_System.Converters"
-        
-        >
+        FontFamily="Segoe UI">
+
     <Window.Resources>
         <conv:InverseBoolConverter x:Key="InverseBoolConverter"/>
     </Window.Resources>
+
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="220"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <Border Background="#2C3E50" Grid.Column="0">
-            <StackPanel Margin="10">
-                <TextBlock Text="SCHOOL ADMIN" Foreground="White" FontSize="20" FontWeight="Bold" Margin="0,20,0,40" HorizontalAlignment="Center"/>
-                <Button Content="Dashboard" Click="NavDashboard_Click" Style="{StaticResource SidebarButtonStyle}"/>
-                <Button Content="Classes" Click="NavClasses_Click" Style="{StaticResource SidebarButtonStyle}"/>
-                <Button Content="Students" Click="NavStudents_Click" Style="{StaticResource SidebarButtonStyle}"/>
-                <Button Content="Teachers" Click="NavTeachers_Click" Style="{StaticResource SidebarButtonStyle}"/>
-            </StackPanel>
+        <Border Background="#2C3E50" Grid.Column="0" Padding="10,30,10,10">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" Margin="0,0,0,30" HorizontalAlignment="Center">
+                    <Border Width="60" Height="60" Background="#34495E" CornerRadius="30" Margin="0,0,0,10">
+                        <TextBlock Text="🏫" FontSize="32" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <TextBlock Text="Navigation Menu" Foreground="#7F8C8D" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center"/>
+                </StackPanel>
+
+                <StackPanel Grid.Row="1">
+                    <Button Content="📊  Dashboard" Click="NavDashboard_Click" Style="{StaticResource SidebarButtonStyle}" Margin="0,0,0,5"/>
+
+                    <Button Content="📝  Attendance" Click="NavAttendance_Click" Style="{StaticResource SidebarButtonStyle}" Margin="0,0,0,5"/>
+
+                    <Button Content="🏫  Classes" Click="NavClasses_Click" Style="{StaticResource SidebarButtonStyle}" Margin="0,0,0,5"/>
+                    <Button Content="👨‍🎓  Students" Click="NavStudents_Click" Style="{StaticResource SidebarButtonStyle}" Margin="0,0,0,5"/>
+                    <Button Content="👨‍🏫  Teachers" Click="NavTeachers_Click" Style="{StaticResource SidebarButtonStyle}" Margin="0,0,0,5"/>
+                    <Button Content="📢  Notice Board" Click="NavNoticeBoard_Click" Style="{StaticResource SidebarButtonStyle}"/>
+                </StackPanel>
+            </Grid>
         </Border>
 
-        <TabControl x:Name="MainTabControl" Grid.Column="1" Background="Transparent" BorderThickness="0" Margin="10">
-            <TabItem Header="Attendance">
-                <Grid Margin="10">
-                    <TabControl Background="Transparent" BorderThickness="0,1,0,0">
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="65"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
 
-                        <TabItem Header="Mark Attendance">
-                            <Grid Margin="0,10,0,0">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="*"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
+            <Border Grid.Row="0" Background="White" BorderBrush="#E2E8F0" BorderThickness="0,0,0,1" Padding="20,0">
+                <Grid>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Left">
+                        <TextBlock Text="SCHOOL ADMIN" FontSize="20" FontWeight="Black" Foreground="#2C3E50"/>
+                        <Border Width="1" Height="20" Background="#CBD5E1" Margin="15,0"/>
+                        <TextBlock x:Name="CurrentTabTitle" Text="Control Dashboard" FontSize="15" FontWeight="SemiBold" Foreground="#64748B" VerticalAlignment="Center"/>
+                    </StackPanel>
 
-                                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                                    <TextBlock Text="Date:" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                                    <DatePicker x:Name="AttendanceDatePicker" Width="150" SelectedDate="{x:Static sys:DateTime.Now}"/>
-                                    <Button Content="Load Students" Margin="10,0,0,0" Width="120" Click="LoadAttendanceList_Click" Background="#3498DB" Foreground="White"/>
+                    <Button Content="Logout" 
+                            Width="90" Height="32" 
+                            Background="#E74C3C" Foreground="White" 
+                            FontWeight="Bold" FontSize="12" Cursor="Hand"
+                            HorizontalAlignment="Right" VerticalAlignment="Center"
+                            Click="LogoutBtn_Click">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="6"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <TabControl x:Name="MainTabControl" Grid.Row="1" Background="Transparent" BorderThickness="0" Margin="15" SelectionChanged="MainTabControl_SelectionChanged">
+                <TabControl.ItemContainerStyle>
+                    <Style TargetType="TabItem">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                    </Style>
+                </TabControl.ItemContainerStyle>
+
+                <TabItem>
+                    <Grid Margin="5">
+                        <TabControl Background="Transparent" BorderThickness="0,1,0,0">
+                            <TabItem Header="Mark Attendance">
+                                <Grid Margin="0,10,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                        <TextBlock Text="Date:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                        <DatePicker x:Name="AttendanceDatePicker" Width="150" SelectedDate="{x:Static sys:DateTime.Now}"/>
+                                        <Button Content="Load Students" Margin="10,0,0,0" Width="120" Click="LoadAttendanceList_Click" Background="#3498DB" Foreground="White"/>
+                                    </StackPanel>
+                                    <DataGrid x:Name="AttendanceGrid" Grid.Row="1" AutoGenerateColumns="False" CanUserAddRows="False">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Student Name" Binding="{Binding FirstName}" Width="*" IsReadOnly="True"/>
+                                            <DataGridTemplateColumn Header="Status" Width="200">
+                                                <DataGridTemplateColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <RadioButton Content="Present" IsChecked="{Binding IsPresent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="5"/>
+                                                            <RadioButton Content="Absent" IsChecked="{Binding IsPresent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBoolConverter}}" Margin="5"/>
+                                                        </StackPanel>
+                                                    </DataTemplate>
+                                                </DataGridTemplateColumn.CellTemplate>
+                                            </DataGridTemplateColumn>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                    <Button Content="Save Today's Attendance" Grid.Row="2" Height="35" Margin="0,10,0,0" Background="#27AE60" Foreground="White" Click="SaveAttendance_Click"/>
+                                </Grid>
+                            </TabItem>
+                            <TabItem Header="View History">
+                                <Grid Margin="0,10,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                        <TextBlock Text="Select Date:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                        <DatePicker x:Name="HistoryDatePicker" Width="150" SelectedDate="{x:Static sys:DateTime.Now}"/>
+                                        <Button Content="🔍 Fetch History" Width="120" Margin="10,0,0,0" Click="ViewHistory_Click" Background="#2C3E50" Foreground="White"/>
+                                    </StackPanel>
+                                    <DataGrid x:Name="HistoryGrid" Grid.Row="1" AutoGenerateColumns="False" IsReadOnly="True" AlternatingRowBackground="#F2F2F2">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat=\{0:dd-MM-yyyy\}}" Width="100"/>
+                                            <DataGridTextColumn Header="Student" Binding="{Binding Student.FirstName, TargetNullValue='Deleted Student'}" Width="*"/>
+                                            <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100">
+                                                <DataGridTextColumn.ElementStyle>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="FontWeight" Value="Bold"/>
+                                                    </Style>
+                                                </DataGridTextColumn.ElementStyle>
+                                            </DataGridTextColumn>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </Grid>
+                            </TabItem>
+                        </TabControl>
+                    </Grid>
+                </TabItem>
+
+                <TabItem>
+                    <Grid Margin="5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <UniformGrid Grid.Row="0" Columns="4" Height="100">
+                            <Border Background="White" Margin="5" CornerRadius="8" Effect="{StaticResource CardShadow}">
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <TextBlock Text="Total Students" Foreground="#7F8C8D" FontSize="13"/>
+                                    <TextBlock x:Name="TotalStudentsCount" Text="0" FontSize="24" FontWeight="Bold" Foreground="#2C3E50" HorizontalAlignment="Center"/>
                                 </StackPanel>
-
-                                <DataGrid x:Name="AttendanceGrid" Grid.Row="1" AutoGenerateColumns="False" CanUserAddRows="False">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Student Name" Binding="{Binding FirstName}" Width="*" IsReadOnly="True"/>
-                                        <DataGridTemplateColumn Header="Status" Width="200">
-                                            <DataGridTemplateColumn.CellTemplate>
-                                                <DataTemplate>
-                                                    <StackPanel Orientation="Horizontal">
-                                                        <RadioButton Content="Present" 
-                             IsChecked="{Binding IsPresent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                             Margin="5"/>
-
-                                                        <RadioButton Content="Absent" 
-                             IsChecked="{Binding IsPresent, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InverseBoolConverter}}" 
-                             Margin="5"/>
-                                                    </StackPanel>
-                                                </DataTemplate>
-                                            </DataGridTemplateColumn.CellTemplate>
-                                        </DataGridTemplateColumn>
-                                    </DataGrid.Columns>
-                                </DataGrid>
-
-                                <Button Content="Save Today's Attendance" Grid.Row="2" Height="35" Margin="0,10,0,0" 
-                            Background="#27AE60" Foreground="White" Click="SaveAttendance_Click"/>
-                            </Grid>
-                        </TabItem>
-
-                        <TabItem Header="View History">
-                            <Grid Margin="0,10,0,0">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="*"/>
-                                </Grid.RowDefinitions>
-
-                                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                                    <TextBlock Text="Select Date:" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                                    <DatePicker x:Name="HistoryDatePicker" Width="150" SelectedDate="{x:Static sys:DateTime.Now}"/>
-                                    <Button Content="🔍 Fetch History" Width="120" Margin="10,0,0,0" Click="ViewHistory_Click" Background="#2C3E50" Foreground="White"/>
+                            </Border>
+                            <Border Background="White" Margin="5" CornerRadius="8" Effect="{StaticResource CardShadow}">
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <TextBlock Text="Total Teachers" Foreground="#7F8C8D" FontSize="13"/>
+                                    <TextBlock x:Name="TotalTeachersCount" Text="0" FontSize="24" FontWeight="Bold" Foreground="#8E44AD" HorizontalAlignment="Center"/>
                                 </StackPanel>
+                            </Border>
+                            <Border Background="White" Margin="5" CornerRadius="8" Effect="{StaticResource CardShadow}">
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <TextBlock Text="Attendance Rate" Foreground="#7F8C8D" FontSize="13"/>
+                                    <TextBlock x:Name="AttendanceRateText" Text="0%" FontSize="24" FontWeight="Bold" Foreground="#27AE60" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Background="White" Margin="5" CornerRadius="8" Effect="{StaticResource CardShadow}">
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                    <TextBlock Text="Total Classes" Foreground="#7F8C8D" FontSize="13"/>
+                                    <TextBlock x:Name="TotalClassesCount" Text="0" FontSize="24" FontWeight="Bold" Foreground="#2980B9" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+                        </UniformGrid>
+                        <GroupBox Header="Recent System Logs" Grid.Row="1" Margin="5,15,5,5">
+                            <ListBox x:Name="ActivityLog" BorderThickness="0"/>
+                        </GroupBox>
+                    </Grid>
+                </TabItem>
 
-                                <DataGrid x:Name="HistoryGrid" Grid.Row="1" AutoGenerateColumns="False" IsReadOnly="True" AlternatingRowBackground="#F2F2F2">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Date" Binding="{Binding Date, StringFormat=\{0:dd-MM-yyyy\}}" Width="100"/>
-                                        <DataGridTextColumn Header="Student" 
-                    Binding="{Binding Student.FirstName, TargetNullValue='Deleted Student'}" 
-                    Width="*"/>
-                                        <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100">
-                                            <DataGridTextColumn.ElementStyle>
-                                                <Style TargetType="TextBlock">
-                                                    <Setter Property="FontWeight" Value="Bold"/>
-                                                </Style>
-                                            </DataGridTextColumn.ElementStyle>
-                                        </DataGridTextColumn>
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                            </Grid>
-                        </TabItem>
-                    </TabControl>
-                </Grid>
-            </TabItem>
-            <TabItem Header="Dashboard">
-                <Grid Margin="20">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
+                <TabItem>
+                    <Grid Margin="5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,15">
+                            <Button Content="+ Add New Student" Width="150" Height="35" Background="#27AE60" Foreground="White" Click="OpenAddStudent_Click"/>
+                            <Button Content="↻ Refresh List" Width="120" Height="35" Margin="10,0,0,0" Click="RefreshStudents_Click"/>
+                        </StackPanel>
+                        <DataGrid x:Name="StudentDataGrid" Grid.Row="1" AutoGenerateColumns="False" IsReadOnly="True" MouseDoubleClick="StudentDataGrid_MouseDoubleClick" Background="White" RowHeight="35" AlternatingRowBackground="#F9F9F9" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="True">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
+                                <DataGridTextColumn Header="First Name" Binding="{Binding FirstName}" Width="*"/>
+                                <DataGridTextColumn Header="Last Name" Binding="{Binding LastName}" Width="*"/>
+                                <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="1.5*"/>
+                                <DataGridTextColumn Header="Phone" Binding="{Binding PhoneNumber}" Width="120"/>
+                                <DataGridTextColumn Header="Class" Binding="{Binding AssignedClass.ClassName}" Width="*"/>
+                                <DataGridTextColumn Header="Teacher" Binding="{Binding AssignedTeacher.FirstName}" Width="*"/>
+                                <DataGridTemplateColumn Header="Action" Width="150">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Button Content="✏️ Edit" Margin="2" Padding="8,2" Background="#F39C12" Foreground="White" Click="EditStudentBtn_Click" Cursor="Hand"/>
+                                                <Button Content="🗑️ Delete" Margin="2" Padding="8,2" Background="#E74C3C" Foreground="White" Click="DeleteStudentBtn_Click" Cursor="Hand"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </TabItem>
 
-                    <UniformGrid Grid.Row="0" Columns="4" Height="120">
-                        <Border Background="White" Margin="10" CornerRadius="10" Effect="{StaticResource CardShadow}">
-                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                <TextBlock Text="Total Students" Foreground="#7F8C8D" FontSize="14"/>
-                                <TextBlock x:Name="TotalStudentsCount" Text="0" FontSize="28" FontWeight="Bold" Foreground="#2C3E50" HorizontalAlignment="Center"/>
+                <TabItem>
+                    <Grid Margin="5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,15">
+                            <Button Content="+ Add New Class" Width="150" Height="35" Background="#2980B9" Foreground="White" Click="OpenFormButton_Click"/>
+                            <Button Content="↻ Refresh List" Width="120" Height="35" Margin="10,0,0,0" Click="ShowRecordsButton_Click"/>
+                        </StackPanel>
+                        <DataGrid x:Name="ClassesData" Grid.Row="1" AutoGenerateColumns="False" IsReadOnly="True" MouseDoubleClick="ClassesData_MouseDoubleClick" HorizontalScrollBarVisibility="Auto">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
+                                <DataGridTextColumn Header="Class Name" Binding="{Binding ClassName}" Width="*"/>
+                                <DataGridTextColumn Header="Room" Binding="{Binding ClassRoom}" Width="*"/>
+                                <DataGridTemplateColumn Header="Action" Width="150">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Button Content="✏️ Edit" Margin="2" Padding="5,2" Background="#F39C12" Foreground="White" Click="EditClassBtn_Click"/>
+                                                <Button Content="🗑️ Delete" Margin="2" Padding="5,2" Background="#E74C3C" Foreground="White" Click="DeleteClassBtn_Click"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </TabItem>
+
+                <TabItem>
+                    <Grid Margin="5">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,15">
+                            <Button Content="+ Add Teacher" Width="150" Height="35" Background="#8E44AD" Foreground="White" Click="OpenAddTeacher_Click"/>
+                            <Button Content="↻ Refresh List" Width="120" Height="35" Margin="10,0,0,0" Click="RefreshTeachers_Click"/>
+                        </StackPanel>
+                        <DataGrid x:Name="TeacherDataGrid" Grid.Row="1" AutoGenerateColumns="False" IsReadOnly="True" MouseDoubleClick="TeacherDataGrid_MouseDoubleClick" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" SelectionChanged="TeacherDataGrid_SelectionChanged">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
+                                <DataGridTextColumn Header="First Name" Binding="{Binding FirstName}" Width="*"/>
+                                <DataGridTextColumn Header="Last Name" Binding="{Binding LastName}" Width="*"/>
+                                <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="1.5*"/>
+                                <DataGridTextColumn Header="Phone" Binding="{Binding PhoneNumber}" Width="120"/>
+                                <DataGridTextColumn Header="Subject" Binding="{Binding Subject}" Width="*"/>
+                                <DataGridTemplateColumn Header="Action" Width="150">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal">
+                                                <Button Content="✏️ Edit" Click="EditTeacherBtn_Click" Margin="2" Padding="5,2" Background="#F39C12" Foreground="White"/>
+                                                <Button Content="🗑️ Delete" Click="DeleteTeacherBtn_Click" Margin="2" Padding="5,2" Background="#E74C3C" Foreground="White"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </TabItem>
+
+                <TabItem>
+                    <Grid Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="310"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Border Background="White" Grid.Column="0" Margin="0,0,15,0" CornerRadius="10" Padding="15">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="10" ShadowDepth="1" Opacity="0.1"/>
+                            </Border.Effect>
+                            <StackPanel>
+                                <TextBlock Text="Manage Announcements" FontSize="16" FontWeight="Bold" Foreground="#2C3E50" Margin="0,0,0,20"/>
+                                <TextBox x:Name="NoticeIdTxt" Visibility="Collapsed" Width="100" Height="25" Margin="5"/>
+                                <TextBlock Text="Notice Title" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                                <TextBox x:Name="NoticeTitleTxt" Height="30" Margin="0,0,0,15" VerticalContentAlignment="Center" Padding="5,0,0,0"/>
+                                <TextBlock Text="Content" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                                <TextBox x:Name="NoticeContentTxt" Height="150" TextWrapping="Wrap" AcceptsReturn="True" Margin="0,0,0,20" Padding="5"/>
+                                <Button Content="🚀 Publish Notice" x:Name="SaveNoticeBtn" Height="35" Background="#2980B9" Foreground="White" FontWeight="Bold" Click="SaveNotice_Click"/>
+                                <Button Content="Clear Form" Height="30" Margin="0,10,0,0" Background="#BDC3C7" Foreground="Black" Click="ClearNoticeForm_Click"/>
                             </StackPanel>
                         </Border>
-
-                        <Border Background="White" Margin="10" CornerRadius="10" Effect="{StaticResource CardShadow}">
-                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                <TextBlock Text="Total Teachers" Foreground="#7F8C8D" FontSize="14"/>
-                                <TextBlock x:Name="TotalTeachersCount" Text="0" FontSize="28" FontWeight="Bold" Foreground="#8E44AD" HorizontalAlignment="Center"/>
-                            </StackPanel>
-                        </Border>
-
-                        <Border Background="White" Margin="10" CornerRadius="10" Effect="{StaticResource CardShadow}">
-                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                <TextBlock Text="Attendance Rate" Foreground="#7F8C8D" FontSize="14"/>
-                                <TextBlock x:Name="AttendanceRateText" Text="0%" FontSize="28" FontWeight="Bold" Foreground="#27AE60" HorizontalAlignment="Center"/>
-                            </StackPanel>
-                        </Border>
-
-                        <Border Background="White" Margin="10" CornerRadius="10" Effect="{StaticResource CardShadow}">
-                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                <TextBlock Text="Total Classes" Foreground="#7F8C8D" FontSize="14"/>
-                                <TextBlock x:Name="TotalClassesCount" Text="0" FontSize="28" FontWeight="Bold" Foreground="#2980B9" HorizontalAlignment="Center"/>
-                            </StackPanel>
-                        </Border>
-                    </UniformGrid>
-
-                    <GroupBox Header="Recent Activity" Grid.Row="1" Margin="10,20,10,10">
-                        <ListBox x:Name="ActivityLog" BorderThickness="0"/>
-                    </GroupBox>
-                </Grid>
-            </TabItem>
-            <TabItem Header="Students">
-                <Grid Margin="10">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-
-                    <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,20">
-                        <Button Content="+ Add New Student" Width="150" Height="35" Background="#27AE60" Foreground="White" Click="OpenAddStudent_Click"/>
-                        <Button Content="↻ Refresh List" Width="120" Height="35" Margin="10,0,0,0" Click="RefreshStudents_Click"/>
-                    </StackPanel>
-
-                    <DataGrid x:Name="StudentDataGrid" Grid.Row="1" 
-                              AutoGenerateColumns="False" IsReadOnly="True" 
-                              MouseDoubleClick="StudentDataGrid_MouseDoubleClick"
-                              Background="White" RowHeight="35" AlternatingRowBackground="#F9F9F9"
-                              HorizontalScrollBarVisibility="Auto" 
-                              VerticalScrollBarVisibility="Auto"
-                              ScrollViewer.CanContentScroll="True">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
-                            <DataGridTextColumn Header="First Name" Binding="{Binding FirstName}" Width="*"/>
-                            <DataGridTextColumn Header="Last Name" Binding="{Binding LastName}" Width="*"/>
-                            <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="1.5*"/>
-                            <DataGridTextColumn Header="Phone" Binding="{Binding PhoneNumber}" Width="120"/>
-
-                            <DataGridTextColumn Header="Class" Binding="{Binding AssignedClass.ClassName}" Width="*"/>
-                            <DataGridTextColumn Header="Teacher" Binding="{Binding AssignedTeacher.FirstName}" Width="*"/>
-                            <DataGridTemplateColumn Header="Action" Width="150">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <StackPanel Orientation="Horizontal">
-                                            <Button Content="✏️ Edit" Margin="2" Padding="8,2" 
-                                                    Background="#F39C12" Foreground="White" 
-                                                    Click="EditStudentBtn_Click" Cursor="Hand"/>
-                                            <Button Content="🗑️ Delete" Margin="2" Padding="8,2" 
-                                                    Background="#E74C3C" Foreground="White" 
-                                                    Click="DeleteStudentBtn_Click" Cursor="Hand"/>
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </Grid>
-            </TabItem>
-
-            <TabItem Header="Classes">
-                <Grid Margin="10">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="124*"/>
-                        <ColumnDefinition Width="13*"/>
-                        <ColumnDefinition Width="619*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-
-                    <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,20" Grid.ColumnSpan="3">
-                        <Button Content="+ Add New Class" Width="150" Height="35" Background="#2980B9" Foreground="White" Click="OpenFormButton_Click"/>
-                        <Button Content="↻ Refresh List" Width="120" Height="35" Margin="10,0,0,0" Click="ShowRecordsButton_Click"/>
-                    </StackPanel>
-
-                    <DataGrid x:Name="ClassesData" Grid.Row="1" AutoGenerateColumns="False" 
-          IsReadOnly="True" MouseDoubleClick="ClassesData_MouseDoubleClick"
-          HorizontalScrollBarVisibility="Auto" Grid.ColumnSpan="3">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
-                            <DataGridTextColumn Header="Class Name" Binding="{Binding ClassName}" Width="*"/>
-                            <DataGridTextColumn Header="Room" Binding="{Binding ClassRoom}" Width="*"/>
-
-                            <DataGridTemplateColumn Header="Action" Width="150">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <StackPanel Orientation="Horizontal">
-                                            <Button Content="✏️ Edit" Margin="2" Padding="5,2" 
-                                Background="#F39C12" Foreground="White" 
-                                Click="EditClassBtn_Click"/>
-
-                                            <Button Content="🗑️ Delete" Margin="2" Padding="5,2" 
-                                Background="#E74C3C" Foreground="White" 
-                                Click="DeleteClassBtn_Click"/>
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </Grid>
-            </TabItem>
-            <TabItem Header="Teachers">
-                <Grid Margin="10">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-
-                    <!-- Added Refresh Button here -->
-                    <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,20">
-                        <Button Content="+ Add Teacher" Width="150" Height="35" Background="#8E44AD" Foreground="White" Click="OpenAddTeacher_Click"/>
-                        <Button Content="↻ Refresh List" Width="120" Height="35" Margin="10,0,0,0" Click="RefreshTeachers_Click"/>
-                    </StackPanel>
-
-                    <DataGrid x:Name="TeacherDataGrid" Grid.Row="1" 
-                  AutoGenerateColumns="False" IsReadOnly="True" 
-                  MouseDoubleClick="TeacherDataGrid_MouseDoubleClick"
-                  HorizontalScrollBarVisibility="Auto"
-                  VerticalScrollBarVisibility="Auto" SelectionChanged="TeacherDataGrid_SelectionChanged">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
-                            <DataGridTextColumn Header="First Name" Binding="{Binding FirstName}" Width="*"/>
-                            <DataGridTextColumn Header="Last Name" Binding="{Binding LastName}" Width="*"/>
-                            <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="1.5*"/>
-                            <DataGridTextColumn Header="Phone" Binding="{Binding PhoneNumber}" Width="120"/>
-                            <DataGridTextColumn Header="Subject" Binding="{Binding Subject}" Width="*"/>
-
-                            <DataGridTemplateColumn Header="Action" Width="150">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <StackPanel Orientation="Horizontal">
-                                            <Button Content="✏️ Edit" Click="EditTeacherBtn_Click" Margin="2" Padding="5,2" Background="#F39C12" Foreground="White"/>
-                                            <Button Content="🗑️ Delete" Click="DeleteTeacherBtn_Click" Margin="2" Padding="5,2" Background="#E74C3C" Foreground="White"/>
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </Grid>
-            </TabItem>
-
-        </TabControl>
+                        <Grid Grid.Column="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="Active Broadcasts" FontSize="16" FontWeight="Bold" Foreground="#2C3E50" Margin="0,0,0,10"/>
+                            <DataGrid x:Name="NoticesDataGrid" Grid.Row="1" AutoGenerateColumns="False" IsReadOnly="True" RowHeight="40" Background="White" AlternatingRowBackground="#F9F9F9">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Date" Binding="{Binding DatePosted, StringFormat=\{0:dd-MM-yyyy HH:mm\}}" Width="130"/>
+                                    <DataGridTextColumn Header="Title" Binding="{Binding Title}" Width="150" FontWeight="Bold"/>
+                                    <DataGridTextColumn Header="Message Content" Binding="{Binding Content}" Width="*"/>
+                                    <DataGridTemplateColumn Header="Actions" Width="140">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Button Content="✏️" ToolTip="Edit" Click="EditNotice_Click" Margin="2" Padding="5,2" Background="#F39C12" Foreground="White"/>
+                                                    <Button Content="🗑️" ToolTip="Delete" Click="DeleteNotice_Click" Margin="2" Padding="5,2" Background="#E74C3C" Foreground="White"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </Grid>
+                </TabItem>
+            </TabControl>
+        </Grid>
     </Grid>
-
 </Window>
